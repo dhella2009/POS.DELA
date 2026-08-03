@@ -84,9 +84,17 @@ class PenjualanController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Penjualan $penjualan)
     {
-        //
+        $sale = $penjualan;
+
+        abort_if($sale->status === 'COMPLETED', 403);
+
+        $sale->load('itemPenjualan');
+        $products = Produk::orderBy('nama')->get();
+        $mode = 'edit';
+
+        return view('penjualan.pos', compact('sale', 'products', 'mode'));
     }
 
     /**
@@ -127,6 +135,8 @@ class PenjualanController extends Controller
      */
     public function destroy(Penjualan $penjualan)
     {
+        $this->authorize('delete', $penjualan);
+        
         if ($penjualan->status !== 'OPEN') {
             return redirect()->route('penjualan.create')->with('errors', 'Transaksi sudah selesai tidak bisa di batalkan');
         }

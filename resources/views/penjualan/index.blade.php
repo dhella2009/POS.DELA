@@ -60,8 +60,11 @@
             <td>{{ $sale->status }}</td>
             <td class="d-flex gap-1">
                 <a href="" class="btn btn-primary">Detail</a>
+                @can('delete', $sale)
                 ||
-                <a href="" class="btn btn-warning">Edit</a>
+                <a href="{{ route('penjualan.edit', $sale) }}" class="btn btn-warning">Edit</a>
+                @endcan
+                @can('delete', $sale)
                 ||
 
                 <form action="{{ route('penjualan.destroy', $sale) }}" method="POST" class="d-inline">
@@ -75,6 +78,7 @@
 
                     </button>
                 </form>
+                @endcan
             </td>
         </tr>
 
