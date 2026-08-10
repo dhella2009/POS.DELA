@@ -76,9 +76,11 @@ class PenjualanController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Penjualan $penjualan)
     {
-        //
+        $sale = $penjualan;
+        $sale->load('itemPenjualan.produk');
+        return view('penjualan.show', compact('sale'));
     }
 
     /**
