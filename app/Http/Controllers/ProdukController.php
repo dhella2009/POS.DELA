@@ -47,7 +47,7 @@ class ProdukController extends Controller
 
     /**
      * Store a newly created resource in storage.
-     */0
+     */
     public function store(StoreRequest $request)
     {
         $this->authorize('create', Produk::class);
