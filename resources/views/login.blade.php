@@ -1,34 +1,51 @@
 @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 <style>
     body {
-        background-color: #f8c8dc; /* background pink */
+        background-color: #fdf2f8; /* sama kayak dashboard */
+        margin: 0;
+        padding: 0;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    * {
+        box-sizing: border-box;
     }
 
     .card {
-        background-color: transparent;
+        background: #ffffff;
         border: 1px solid #f5a9c8;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(244,114,182,0.2);
     }
 
     .card-header {
         background-color: transparent;
-        color: #ff69b4;
+        color: #1a1a1a;
         border-bottom: 1px solid #f5a9c8;
+        border-radius: 16px 16px 0 0;
+        font-weight: 600;
     }
 
     .form-label {
-        color: #ff69b4;
+        color: #1a1a1a;
+    }
+
+    .form-control {
+        border-radius: 8px;
     }
 
     .btn-pink {
-        background-color: #f8c8dc;
-        color: #ff69b4;
-        border: 1px solid #f5a9c8;
+        background-color: #f9a8d4;
+        color: #ffffff;
+        border: 1px solid #f472b6;
     }
 
     .btn-pink:hover {
-        background-color: #f5b6d1;
-        color: #ff69b4;
+        background-color: #f472b6;
+        color: #ffffff;
     }
 </style>
 
