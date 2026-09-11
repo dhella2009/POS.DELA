@@ -112,16 +112,40 @@
         <div class="card-footer">
             <strong>Rp {{ number_format($sale->total_pembayaran) }}</strong>
 
-            <form method="POST"
+            <form id="checkoutForm" method="POST"
                 action="{{ route('penjualan.update', $sale->id) }}"
-                onsubmit="return confirm('Yakin ingin checkout?')" class="mt-2">
+                onsubmit="return handleCheckoutSubmit()" class="mt-2">
                 @csrf
                 @method('PUT')
-                <select name="payment_method" class="form-select mb-2">
+
+                <select name="payment_method" id="paymentMethod" class="form-select mb-2" onchange="togglePaymentFields()">
                     <option value="">Pilih Pembayaran</option>
                     <option value="CASH">Cash</option>
                     <option value="QRIS">QRIS</option>
                 </select>
+
+                {{-- ==== AREA QRIS (generated) ==== --}}
+                <div id="qrisArea" class="mb-3 text-center d-none">
+                    <div id="qrcodeContainer" class="d-inline-block p-2 bg-white" style="border:1px solid #f5a9c8; border-radius:12px;"></div>
+                    <p class="text-muted small mt-1 mb-0">Scan kode QRIS di atas untuk membayar</p>
+                </div>
+
+                {{-- ==== AREA CASH ==== --}}
+                <div id="cashArea" class="mb-3 d-none">
+                    <label class="form-label small mb-1">Jumlah Uang Diterima</label>
+                    <input type="number"
+                        id="uangDiterima"
+                        class="form-control mb-2"
+                        placeholder="Masukkan jumlah uang"
+                        min="0"
+                        oninput="hitungKembalian()">
+
+                    <div class="d-flex justify-content-between">
+                        <span class="fw-semibold">Kembalian:</span>
+                        <span id="kembalianText" class="fw-bold">Rp 0</span>
+                    </div>
+                </div>
+
                 <button class="btn btn-success w-100 {{ $sale->status === 'COMPLETED' ? 'disabled' : '' }}">
                     Checkout
                 </button>
@@ -142,4 +166,78 @@
 </div>
 
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script>
+    const totalPembayaran = {{ $sale->total_pembayaran }};
+    const saleId = {{ $sale->id }};
+    let qrGenerated = false;
+
+    function togglePaymentFields() {
+        const method = document.getElementById('paymentMethod').value;
+        const qrisArea = document.getElementById('qrisArea');
+        const cashArea = document.getElementById('cashArea');
+
+        qrisArea.classList.add('d-none');
+        cashArea.classList.add('d-none');
+
+        if (method === 'QRIS') {
+            qrisArea.classList.remove('d-none');
+            generateQris();
+        } else if (method === 'CASH') {
+            cashArea.classList.remove('d-none');
+            document.getElementById('uangDiterima').value = '';
+            document.getElementById('kembalianText').innerText = 'Rp 0';
+        }
+    }
+
+    function generateQris() {
+        const container = document.getElementById('qrcodeContainer');
+
+        if (qrGenerated) return;
+
+        const payload = 'POS-TRX-' + saleId + '-TOTAL-' + totalPembayaran;
+
+        new QRCode(container, {
+            text: payload,
+            width: 200,
+            height: 200,
+            colorDark: '#1a1a1a',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.H
+        });
+
+        qrGenerated = true;
+    }
+
+    function hitungKembalian() {
+        const diterima = parseFloat(document.getElementById('uangDiterima').value) || 0;
+        const kembalian = diterima - totalPembayaran;
+        const teks = kembalian >= 0
+            ? 'Rp ' + kembalian.toLocaleString('id-ID')
+            : 'Kurang Rp ' + Math.abs(kembalian).toLocaleString('id-ID');
+
+        document.getElementById('kembalianText').innerText = teks;
+        document.getElementById('kembalianText').style.color = kembalian >= 0 ? '#198754' : '#dc3545';
+    }
+
+    function handleCheckoutSubmit() {
+        const method = document.getElementById('paymentMethod').value;
+
+        if (!confirm('Yakin ingin checkout?')) {
+            return false;
+        }
+
+        if (method === 'CASH') {
+            const diterima = parseFloat(document.getElementById('uangDiterima').value) || 0;
+            if (diterima < totalPembayaran) {
+                alert('Jumlah uang diterima kurang dari total pembayaran.');
+                return false;
+            }
+        }
+
+        return true;
+    }
+</script>
+
 @endsection

@@ -1,27 +1,17 @@
-@extends('layouts.app')
-
-@section('title', 'Detail Penjualan')
-
-@section('content')
-
-@include('layouts.navbar')
-
 <style>
     .receipt-wrapper {
         display: flex;
         justify-content: center;
-        margin-top: 20px;
     }
 
     .receipt {
-        width: 380px;
+        width: 100%;
+        max-width: 380px;
         background: #fff;
         padding: 24px 20px;
         font-family: 'Courier New', Courier, monospace;
         font-size: 14px;
         color: #212529;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        border-radius: 4px;
     }
 
     .receipt-header {
@@ -78,29 +68,7 @@
         color: #6c757d;
         font-size: 12px;
     }
-
-    @media print {
-        .no-print {
-            display: none !important;
-        }
-
-        .receipt-wrapper {
-            margin-top: 0;
-        }
-
-        .receipt {
-            box-shadow: none;
-            width: 100%;
-        }
-    }
 </style>
-
-<h1 class="no-print">Detail Penjualan #{{ $sale->id }}</h1>
-
-<div class="no-print mb-3">
-    <a href="{{ route('penjualan.index') }}" class="btn btn-secondary">&larr; Kembali</a>
-    <button onclick="window.print()" class="btn btn-primary">🖨️ Cetak Struk</button>
-</div>
 
 <div class="receipt-wrapper">
     <div class="receipt">
@@ -149,5 +117,3 @@
 
     </div>
 </div>
-
-@endsection

@@ -39,6 +39,7 @@
             <th scope="col">#</th>
             <th scope="col">User</th>
             <th scope="col">Foto</th>
+            <th scope="col">Jenis</th>
             <th scope="col">Nama</th>
             <th scope="col">Harga Beli</th>
             <th scope="col">Harga Jual</th>
@@ -63,6 +64,8 @@
                     class="img-thumbnail"
                 >
             </td>
+
+            <td>{{ $product->jenis?->nama ?? '-' }}</td>
 
             <td>{{ $product->nama }}</td>
             <td>{{ $product->harga_beli }}</td>
@@ -99,7 +102,7 @@
         @empty
 
         <tr>
-            <td colspan="8" class="text-center">
+            <td colspan="9" class="text-center">
                 Data tidak tersedia.
             </td>
         </tr>

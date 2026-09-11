@@ -59,7 +59,12 @@
             <td>{{ $sale->metode_pembayaran }}</td>
             <td>{{ $sale->status }}</td>
             <td class="d-flex gap-1">
-                <a href="{{ route('penjualan.show', $sale) }}" class="btn btn-primary">Detail</a>
+                <button
+                    type="button"
+                    class="btn btn-primary btn-detail"
+                    data-url="{{ route('penjualan.show', $sale) }}">
+                    Detail
+                </button>
                 @can('delete', $sale)
                 ||
                 <a href="{{ route('penjualan.edit', $sale) }}" class="btn btn-warning">Edit</a>
@@ -95,5 +100,60 @@
 </table>
 
 {{ $sales->links() }}
+
+<!-- Modal Detail Struk -->
+<div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Detail Struk</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="detailModalBody">
+                <div class="text-center py-4">
+                    <div class="spinner-border" role="status"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="printReceipt()">🖨️ Cetak</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll('.btn-detail').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            const url = btn.getAttribute('data-url');
+            const modalBody = document.getElementById('detailModalBody');
+            const modal = new bootstrap.Modal(document.getElementById('detailModal'));
+
+            modalBody.innerHTML = '<div class="text-center py-4"><div class="spinner-border" role="status"></div></div>';
+            modal.show();
+
+            fetch(url, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => response.text())
+                .then(html => {
+                    modalBody.innerHTML = html;
+                })
+                .catch(() => {
+                    modalBody.innerHTML = '<p class="text-danger text-center">Gagal memuat detail transaksi.</p>';
+                });
+        });
+    });
+
+    function printReceipt() {
+        const content = document.getElementById('detailModalBody').innerHTML;
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write('<html><head><title>Struk</title></head><body>' + content + '</body></html>');
+        printWindow.document.close();
+        printWindow.print();
+    }
+</script>
 
 @endsection

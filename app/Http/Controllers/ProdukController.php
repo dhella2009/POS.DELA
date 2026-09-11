@@ -23,14 +23,15 @@ class ProdukController extends Controller
         $keyword = $request->input('search');
 
         if ($keyword) {
-            $products = Produk::when($keyword, function ($query) use ($keyword) {
-                $query->where('nama', 'like', '%' . $keyword . '%');
-            })
+            $products = Produk::with('jenis')
+                ->when($keyword, function ($query) use ($keyword) {
+                    $query->where('nama', 'like', '%' . $keyword . '%');
+                })
                 ->orderBy('nama')
                 ->paginate(10)
                 ->withQueryString();
         } else {
-            $products = Produk::latest()->paginate(10)->withQueryString();
+            $products = Produk::with('jenis')->latest()->paginate(10)->withQueryString();
         }
 
         return view('produk.index', compact('products'));
@@ -134,10 +135,17 @@ class ProdukController extends Controller
     {
         $this->authorize('delete', Produk::class);
 
-        if ($produk->foto) {
+        if ($produk->itemPenjualan()->exists()) {
+            return redirect()->route('produk.index')
+                ->with('error', 'Produk tidak bisa dihapus karena sudah memiliki riwayat transaksi penjualan.');
+        }
+
+        if ($produk->foto && Storage::disk('public')->exists($produk->foto)) {
             Storage::disk('public')->delete($produk->foto);
         }
+
         $produk->delete();
+
         return redirect()->route('produk.index')->with('success', 'Produk deleted successfully.');
     }
 }
